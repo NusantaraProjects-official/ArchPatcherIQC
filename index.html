@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone IQC Generator - AnaBot API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            color: #fff;
+            padding: 32px 24px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #aaa;
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="time"],
+        textarea,
+        select,
+        input[type="color"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e5e5e5;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #fff;
+            color: #1a1a1a;
+        }
+
+        input[type="text"]:focus,
+        input[type="time"]:focus,
+        textarea:focus,
+        select:focus,
+        input[type="color"]:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+            font-family: 'Menlo', 'Monaco', monospace;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .color-input-wrapper input[type="color"] {
+            width: 60px;
+            height: 46px;
+            padding: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .color-input-wrapper input[type="text"] {
+            flex: 1;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        button {
+            flex: 1;
+            padding: 13px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-generate {
+            background: #000;
+            color: #fff;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            background: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-generate:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: #f0f0f0;
+            color: #000;
+            border: 2px solid #e5e5e5;
+        }
+
+        .btn-download:hover:not(:disabled) {
+            background: #e5e5e5;
+            border-color: #d0d0d0;
+        }
+
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: #fff;
+            color: #999;
+            border: 2px solid #e5e5e5;
+        }
+
+        .btn-clear:hover {
+            color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .preview-section {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .preview-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-box {
+            background: #f9f9f9;
+            border: 2px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 12px;
+            min-height: 100px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 8px;
+        }
+
+        .preview-box.loading {
+            color: #0ea5e9;
+            font-size: 14px;
+        }
+
+        .preview-box.empty {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .status-message {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-message.show {
+            display: flex;
+        }
+
+        .status-message.success {
+            background: #f0fdf4;
+            color: #166534;
+            border-left: 3px solid #22c55e;
+        }
+
+        .status-message.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 3px solid #ef4444;
+        }
+
+        .status-message.loading {
+            background: #f0f9ff;
+            color: #0369a1;
+            border-left: 3px solid #0ea5e9;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #0ea5e9;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 16px;
+            }
+
+            .header {
+                padding: 24px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 24px 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .form-row,
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍎 iPhone IQC Generator</h1>
+            <p>Powered by AnaBot API</p>
+        </div>
+
+        <div class="content">
+            <form id="iqcForm">
+                <!-- Main Text Input -->
+                <div class="form-group">
+                    <label for="text">Chat Text <span class="required">*</span></label>
+                    <textarea 
+                        id="text" 
+                        placeholder="Masukkan pesan chat Anda..."
+                        required
+                    ></textarea>
+                    <span class="info-badge">Max 500 karakter</span>
+                </div>
+
+                <!-- Times -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="chatTime">Chat Time <span class="required">*</span></label>
+                        <input 
+                            type="time" 
+                            id="chatTime" 
+                            value="11:02"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="statusBarTime">Status Bar Time <span class="required">*</span></label>
+                        <input 
+                            type="time" 
+                            id="statusBarTime" 
+                            value="17:01"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Colors -->
+                <div class="form-group">
+                    <label>Warna Bubble</label>
+                    <div class="color-input-wrapper">
+                        <input 
+                            type="color" 
+                            id="bubbleColor" 
+                            value="#272a2f"
+                        >
+                        <input 
+                            type="text" 
+                            id="bubbleColorText" 
+                            value="#272a2f"
+                            placeholder="#272a2f"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Warna Menu</label>
+                    <div class="color-input-wrapper">
+                        <input 
+                            type="color" 
+                            id="menuColor" 
+                            value="#272a2f"
+                        >
+                        <input 
+                            type="text" 
+                            id="menuColorText" 
+                            value="#272a2f"
+                            placeholder="#272a2f"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Warna Text <span class="required">*</span></label>
+                    <div class="color-input-wrapper">
+                        <input 
+                            type="color" 
+                            id="textColor" 
+                            value="#FFFFFF"
+                        >
+                        <input 
+                            type="text" 
+                            id="textColorText" 
+                            value="#FFFFFF"
+                            placeholder="#FFFFFF"
+                        >
+                    </div>
+                </div>
+
+                <!-- Font & Signal -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fontName">Font Name <span class="required">*</span></label>
+                        <select id="fontName" required>
+                            <option value="Arial">Arial</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="signalName">Signal Name <span class="required">*</span></label>
+                        <select id="signalName" required>
+                            <option value="Telkomsel">Telkomsel</option>
+                            <option value="Indosat">Indosat</option>
+                            <option value="XL Axiata">XL Axiata</option>
+                            <option value="Tri">Tri</option>
+                            <option value="Smartfren">Smartfren</option>
+                            <option value="No Signal">No Signal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="submit" class="btn-generate" id="generateBtn">Generate</button>
+                    <button type="button" class="btn-download" id="downloadBtn" disabled>Download</button>
+                    <button type="button" class="btn-clear" id="clearBtn">Clear</button>
+                </div>
+
+                <div class="status-message" id="statusMessage"></div>
+            </form>
+
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <div class="preview-label">Preview</div>
+                <div class="preview-box empty" id="previewBox">
+                    Hasil generate akan ditampilkan di sini
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('iqcForm');
+        const textInput = document.getElementById('text');
+        const chatTimeInput = document.getElementById('chatTime');
+        const statusBarTimeInput = document.getElementById('statusBarTime');
+        
+        const bubbleColorPicker = document.getElementById('bubbleColor');
+        const bubbleColorText = document.getElementById('bubbleColorText');
+        const menuColorPicker = document.getElementById('menuColor');
+        const menuColorText = document.getElementById('menuColorText');
+        const textColorPicker = document.getElementById('textColor');
+        const textColorText = document.getElementById('textColorText');
+        
+        const fontNameSelect = document.getElementById('fontName');
+        const signalNameSelect = document.getElementById('signalName');
+        
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const previewBox = document.getElementById('previewBox');
+        const statusMessage = document.getElementById('statusMessage');
+
+        let currentImageUrl = null;
+
+        // Color picker sync
+        bubbleColorPicker.addEventListener('change', (e) => {
+            bubbleColorText.value = e.target.value;
+        });
+        bubbleColorText.addEventListener('change', (e) => {
+            bubbleColorPicker.value = e.target.value;
+        });
+
+        menuColorPicker.addEventListener('change', (e) => {
+            menuColorText.value = e.target.value;
+        });
+        menuColorText.addEventListener('change', (e) => {
+            menuColorPicker.value = e.target.value;
+        });
+
+        textColorPicker.addEventListener('change', (e) => {
+            textColorText.value = e.target.value;
+        });
+        textColorText.addEventListener('change', (e) => {
+            textColorPicker.value = e.target.value;
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            form.reset();
+            bubbleColorPicker.value = '#272a2f';
+            bubbleColorText.value = '#272a2f';
+            menuColorPicker.value = '#272a2f';
+            menuColorText.value = '#272a2f';
+            textColorPicker.value = '#FFFFFF';
+            textColorText.value = '#FFFFFF';
+            chatTimeInput.value = '11:02';
+            statusBarTimeInput.value = '17:01';
+            previewBox.textContent = 'Hasil generate akan ditampilkan di sini';
+            previewBox.classList.add('empty');
+            previewBox.classList.remove('loading');
+            downloadBtn.disabled = true;
+            currentImageUrl = null;
+            hideStatus();
+        });
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            if (currentImageUrl) {
+                const link = document.createElement('a');
+                link.href = currentImageUrl;
+                link.download = `iqc-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showStatus('✓ Download dimulai!', 'success');
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const text = textInput.value.trim();
+            const chatTime = chatTimeInput.value;
+            const statusBarTime = statusBarTimeInput.value;
+            const bubbleColor = bubbleColorText.value.replace('#', '');
+            const menuColor = menuColorText.value.replace('#', '');
+            const textColor = textColorText.value.replace('#', '');
+            const fontName = fontNameSelect.value;
+            const signalName = signalNameSelect.value;
+
+            if (!text) {
+                showStatus('❌ Masukkan teks terlebih dahulu', 'error');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            downloadBtn.disabled = true;
+            previewBox.classList.add('loading');
+            previewBox.classList.remove('empty');
+            previewBox.textContent = 'Loading...';
+            showStatus('<span class="spinner"></span>Generating...', 'loading');
+
+            try {
+                const proxyUrl = `/api/iqc?text=${encodeURIComponent(text)}&chatTime=${chatTime}&statusBarTime=${statusBarTime}&bubbleColor=${bubbleColor}&menuColor=${menuColor}&textColor=${textColor}&fontName=${fontName}&signalName=${signalName}`;
+
+                console.log('Proxy URL:', proxyUrl);
+
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'image/png, image/jpeg, image/*'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                console.log('Blob size:', blob.size, 'Type:', blob.type);
+
+                if (blob.size === 0) {
+                    throw new Error('API mengembalikan respons kosong');
+                }
+
+                currentImageUrl = URL.createObjectURL(blob);
+
+                previewBox.innerHTML = `<img src="${currentImageUrl}" alt="IQC Preview">`;
+                previewBox.classList.remove('loading', 'empty');
+                downloadBtn.disabled = false;
+                
+                showStatus('✓ Berhasil generate!', 'success');
+
+            } catch (error) {
+                console.error('Full Error:', error);
+                previewBox.innerHTML = `<div style="text-align: center; color: #999;"><p>⚠️ Error</p><small>${error.message}</small></div>`;
+                previewBox.classList.remove('loading');
+                previewBox.classList.add('empty');
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+
+        function showStatus(message, type) {
+            statusMessage.className = `status-message show ${type}`;
+            statusMessage.innerHTML = message;
+        }
+
+        function hideStatus() {
+            statusMessage.classList.remove('show');
+        }
+    </script>
+</body>
+</html>
