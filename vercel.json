@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "iqc.js": {
+      "runtime": "node18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/iqc",
+      "destination": "/iqc.js"
+    }
+  ]
+}
